@@ -37,7 +37,10 @@ public:
 
 	TArray<FVector> PickupLocations;
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	class UParticleSystem* HitParticles;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	class USoundCue* HitSound;
 
 	UFUNCTION(BlueprintCallable)
 	void ShowPickupsLocations();
