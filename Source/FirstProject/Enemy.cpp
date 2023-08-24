@@ -282,14 +282,13 @@ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 
 void AEnemy::Die()
 {
-	SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Dead);
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance && CombatMontage)
 	{
 		AnimInstance->Montage_Play(CombatMontage, 1.35f);
 		AnimInstance->Montage_JumpToSection(FName("Death"),CombatMontage);
 	}
-	
+	SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Dead);
 
 	CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	AgroSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
