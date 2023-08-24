@@ -64,13 +64,13 @@ void AEnemy::BeginPlay()
 	CombatSphere->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::CombatSphereOnOverlapBegin);
 	CombatSphere->OnComponentEndOverlap.AddDynamic(this, &AEnemy::CombatSphereOnOverlapEnd);
 
-	CombatCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::CombatOnOverlapBegin);
-	CombatCollision->OnComponentEndOverlap.AddDynamic(this, &AEnemy::CombatOnOverlapEnd);
+	//CombatCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::CombatOnOverlapBegin);
+	//CombatCollision->OnComponentEndOverlap.AddDynamic(this, &AEnemy::CombatOnOverlapEnd);
 
-	CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	CombatCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
-	CombatCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	CombatCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	//CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//CombatCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	//CombatCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	//CombatCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 }
 
 // Called every frame
@@ -165,30 +165,26 @@ void AEnemy::CombatSphereOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, 
 
 void AEnemy::MoveToTarget(AMain* Target)
 {
-	if (Alive())
+	SetEnemyMovementStatus(EEnemyMovementStatus::EMS_MoveToTarget);
+	if (AIController)
 	{
-		SetEnemyMovementStatus(EEnemyMovementStatus::EMS_MoveToTarget);
-		if (AIController)
+		FAIMoveRequest MoveRequest;
+		MoveRequest.SetGoalActor(Target);
+		MoveRequest.SetAcceptanceRadius(10.0f);
+
+		FNavPathSharedPtr NavPath;
+
+		AIController->MoveTo(MoveRequest, &NavPath);
+		/*
+
+		auto PathPoints = NavPath->GetPathPoints();
+
+		for (auto Point : PathPoints)
 		{
-			FAIMoveRequest MoveRequest;
-			MoveRequest.SetGoalActor(Target);
-			MoveRequest.SetAcceptanceRadius(10.0f);
-
-			FNavPathSharedPtr NavPath;
-
-			AIController->MoveTo(MoveRequest, &NavPath);
-			/*
-
-			auto PathPoints = NavPath->GetPathPoints();
-
-			for (auto Point : PathPoints)
-			{
-				FVector Location = Point.Location;
-				UKismetSystemLibrary::DrawDebugSphere(this, Location, 25.f, 8, FLinearColor::Red, 10.f, 1.5f);
-			}
-			*/
-	}
-	
+			FVector Location = Point.Location;
+			UKismetSystemLibrary::DrawDebugSphere(this, Location, 25.f, 8, FLinearColor::Red, 10.f, 1.5f);
+		}
+		*/
 	
 	}
 }
@@ -225,7 +221,7 @@ void AEnemy::CombatOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor
 }
 void AEnemy::ActivateCollision()
 {
-	CombatCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	//CombatCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	if (SwingSound)
 	{
 		UGameplayStatics::PlaySound2D(this, SwingSound);
@@ -234,7 +230,7 @@ void AEnemy::ActivateCollision()
 
 void AEnemy::DeactivateCollision()
 {
-	CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AEnemy::Attack()
@@ -297,7 +293,7 @@ void AEnemy::Die()
 	}
 	
 
-	CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	AgroSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CombatSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
