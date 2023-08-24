@@ -59,7 +59,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	USoundCue* SwingSound;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	class UBoxComponent* CombatCollision;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")

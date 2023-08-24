@@ -34,9 +34,7 @@ AEnemy::AEnemy()
 
 	CombatCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("CombatCollision"));
 	CombatCollision->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale,FName("EnemySocket"));
-
-
-
+	
 	bOverlappingCombatSphere = false;
 
 	Health = 75.f;
@@ -64,13 +62,13 @@ void AEnemy::BeginPlay()
 	CombatSphere->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::CombatSphereOnOverlapBegin);
 	CombatSphere->OnComponentEndOverlap.AddDynamic(this, &AEnemy::CombatSphereOnOverlapEnd);
 
-	//CombatCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::CombatOnOverlapBegin);
-	//CombatCollision->OnComponentEndOverlap.AddDynamic(this, &AEnemy::CombatOnOverlapEnd);
+	CombatCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::CombatOnOverlapBegin);
+	CombatCollision->OnComponentEndOverlap.AddDynamic(this, &AEnemy::CombatOnOverlapEnd);
 
-	//CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	//CombatCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
-	//CombatCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	//CombatCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CombatCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	CombatCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	CombatCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 }
 
 // Called every frame
@@ -221,7 +219,7 @@ void AEnemy::CombatOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor
 }
 void AEnemy::ActivateCollision()
 {
-	//CombatCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	CombatCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	if (SwingSound)
 	{
 		UGameplayStatics::PlaySound2D(this, SwingSound);
@@ -230,7 +228,7 @@ void AEnemy::ActivateCollision()
 
 void AEnemy::DeactivateCollision()
 {
-	//CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AEnemy::Attack()
@@ -293,7 +291,7 @@ void AEnemy::Die()
 	}
 	
 
-	//CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	AgroSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CombatSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
