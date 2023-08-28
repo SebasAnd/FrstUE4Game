@@ -47,6 +47,8 @@ AEnemy::AEnemy()
 	AttackMaxTime = 3.5f;
 
 	EnemyMovementStatus = EEnemyMovementStatus::EMS_Idle;
+
+	DeathDelay = 3.f;
 }
 
 // Called when the game starts or when spawned
@@ -71,10 +73,12 @@ void AEnemy::BeginPlay()
 	CombatCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 }
 
+
 // Called every frame
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	//UE_LOG(LogTemp, Warning, TEXT("status : %s"), *UEnum::GetDisplayValueAsText(EnemyMovementStatus).ToString());
 
 }
 
@@ -100,7 +104,7 @@ void AEnemy::AgroSphereOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 
 void AEnemy::AgroSphereOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (OtherActor)
+	if (OtherActor && Alive())
 	{
 		AMain* Main = Cast<AMain>(OtherActor);
 		{
@@ -235,11 +239,11 @@ void AEnemy::Attack()
 {
 	if (Alive())
 	{
+		
 		if (AIController)
 		{
 			AIController->StopMovement();
 			SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Attacking);
-			;
 		}
 		if (!bAttacking)
 		{
@@ -258,12 +262,20 @@ void AEnemy::Attack()
 
 void AEnemy::AttackEnd()
 {
-	bAttacking = false;
-	if (bOverlappingCombatSphere)
+	if (Alive())
 	{
-		float AttackTime = FMath::RandRange(AttackMinTime, AttackMaxTime);
-		GetWorldTimerManager().SetTimer(AttackTimer, this, &AEnemy::Attack, AttackTime);
+		bAttacking = false;
+		if (bOverlappingCombatSphere)
+		{
+			float AttackTime = FMath::RandRange(AttackMinTime, AttackMaxTime);
+			GetWorldTimerManager().SetTimer(AttackTimer, this, &AEnemy::Attack, AttackTime);
+		}
 	}
+	else {
+		SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Dead);
+	}
+
+	
 }
 
 float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
@@ -298,10 +310,16 @@ void AEnemy::Die()
 
 void AEnemy::DeathEnd()
 {
-	GetMesh()->bPauseAnims = true;
-	GetMesh()->bNoSkeletonUpdate = true;
+	//GetMesh()->bPauseAnims = true;
+	//GetMesh()->bNoSkeletonUpdate = true;
+	GetWorldTimerManager().SetTimer(DeathTimer, this, &AEnemy::Disappear, DeathDelay);
 }
 
 bool AEnemy::Alive() {
 	return GetEnemyMovementStatus() != EEnemyMovementStatus::EMS_Dead;
+}
+
+void AEnemy::Disappear() 
+{
+	Destroy();
 }
